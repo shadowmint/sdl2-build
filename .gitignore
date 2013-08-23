@@ -1,0 +1,6 @@
+build
+build-*
+*.pyc
+py
+deploy
+*.dylib
