@@ -139,7 +139,7 @@ ExternalProject_Add(
   sdl_mixer_autofail
   SOURCE_DIR ${SRC}
   INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}
-  CONFIGURE_COMMAND ${SRC}/configure --prefix=${CMAKE_CURRENT_BINARY_DIR}  --with-sdl-prefix=${CMAKE_CURRENT_BINARY_DIR}
+  CONFIGURE_COMMAND ${SRC}/configure --prefix=${CMAKE_CURRENT_BINARY_DIR} --with-sdl-prefix=${CMAKE_CURRENT_BINARY_DIR} --enable-music-ogg-shared=no
   BUILD_COMMAND ${MAKE}
 )
 add_library(sdl_mixer UNKNOWN IMPORTED)
