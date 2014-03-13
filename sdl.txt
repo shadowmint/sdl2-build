@@ -16,11 +16,10 @@
 include(ExternalProject)
 
 # Archive names
-set(SDL "SDL-2.0.0-7635")
+set(SDL "SDL-2.0.3-8615")
 set(SDL_IMG "SDL2_image-2.0.0")
 set(SDL_MIXER "SDL2_mixer-2.0.0")
 set(SDL_TTF "SDL2_ttf-2.0.12")
-set(SDL_GFX "sdl2gfx-code")
 set(FREETYPE "freetype-2.5.0.1")
 set(OGG "libogg-1.3.1")
 set(VORBIS "libvorbis-1.3.3")
@@ -31,7 +30,6 @@ if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/src)
   execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_LIST_DIR}/deps/${SDL}.tar.gz WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src)
   execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_LIST_DIR}/deps/${SDL_TTF}.tar.gz WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src)
   execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_LIST_DIR}/deps/${SDL_IMG}.tar.gz WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src)
-  execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_LIST_DIR}/deps/${SDL_GFX}.tar.gz WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src)
   execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_LIST_DIR}/deps/${SDL_MIXER}.tar.gz WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src)
   execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_LIST_DIR}/deps/${FREETYPE}.tar.gz WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src)
   execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_LIST_DIR}/deps/${OGG}.tar.gz WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src)
@@ -118,20 +116,6 @@ add_library(sdl_img UNKNOWN IMPORTED)
 set_property(TARGET sdl_img PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/lib/libSDL2_image.a)
 add_dependencies(sdl_img sdl_img_autofail)
 add_dependencies(sdl_img_autofail sdl)
-
-# SDL gfx
-set(SRC ${CMAKE_CURRENT_BINARY_DIR}/src/${SDL_GFX})
-ExternalProject_Add(
-  sdl_gfx_autofail
-  SOURCE_DIR ${SRC}
-  INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}
-  CONFIGURE_COMMAND ${SRC}/configure --prefix=${CMAKE_CURRENT_BINARY_DIR}  --with-sdl-prefix=${CMAKE_CURRENT_BINARY_DIR}
-  BUILD_COMMAND ${MAKE}
-)
-add_library(sdl_gfx UNKNOWN IMPORTED)
-set_property(TARGET sdl_gfx PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/lib/libSDL2_gfx.a)
-add_dependencies(sdl_gfx sdl_gfx_autofail)
-add_dependencies(sdl_gfx_autofail sdl)
 
 # SDL mixer
 set(SRC ${CMAKE_CURRENT_BINARY_DIR}/src/${SDL_MIXER})

@@ -47,7 +47,7 @@ include_directories(${EXTRA_INCLUDES})
 # Build lib
 add_executable(${BIN} ${SOURCES})
 target_link_libraries(${BIN} ${LIB})
-target_link_libraries(${BIN} sdl sdl_ttf sdl_img sdl_mixer sdl_gfx freetype)
+target_link_libraries(${BIN} sdl sdl_ttf sdl_img sdl_mixer freetype)
 target_link_libraries(${BIN} ${OPENGL_LIBRARIES} ${EXTRA_LIBS})
 if(APPLE)
   target_link_libraries(${BIN} -L${CMAKE_CURRENT_BINARY_DIR}/lib -lSDL2 -lm -liconv -Wl,-framework,OpenGL -Wl,-framework,ForceFeedback -lobjc -Wl,-framework,Cocoa -Wl,-framework,Carbon -Wl,-framework,IOKit -Wl,-framework,CoreAudio -Wl,-framework,AudioToolbox -Wl,-framework,AudioUnit)
