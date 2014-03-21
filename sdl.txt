@@ -20,6 +20,7 @@ set(SDL "SDL-2.0.3-8615")
 set(SDL_IMG "SDL2_image-2.0.0")
 set(SDL_MIXER "SDL2_mixer-2.0.0")
 set(SDL_TTF "SDL2_ttf-2.0.12")
+set(SDL_GPU "SDL_gpu")
 set(FREETYPE "freetype-2.5.0.1")
 set(OGG "libogg-1.3.1")
 set(VORBIS "libvorbis-1.3.3")
@@ -31,6 +32,7 @@ if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/src)
   execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_LIST_DIR}/deps/${SDL_TTF}.tar.gz WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src)
   execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_LIST_DIR}/deps/${SDL_IMG}.tar.gz WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src)
   execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_LIST_DIR}/deps/${SDL_MIXER}.tar.gz WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src)
+  execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_LIST_DIR}/deps/${SDL_GPU}.tar.gz WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src)
   execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_LIST_DIR}/deps/${FREETYPE}.tar.gz WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src)
   execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_LIST_DIR}/deps/${OGG}.tar.gz WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src)
   execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_LIST_DIR}/deps/${VORBIS}.tar.gz WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src)
@@ -48,6 +50,28 @@ ExternalProject_Add(
 add_library(sdl UNKNOWN IMPORTED)
 set_property(TARGET sdl PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/lib/libSDL2.a)
 add_dependencies(sdl sdl_autofail)
+
+# SDL_gpu is clever and understands cmake
+# ...but because nothing else does, we actually build it as an external library
+# There's probably a much better way of doing this, but the cmake configure step
+# for SDL_gpu requires SDL itself to *already* be build, which is troublesom.
+set(SRC ${CMAKE_CURRENT_BINARY_DIR}/src/${SDL_GPU})
+set(SDL2_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/include/SDL2")
+set(SDL2_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/lib/libSDL2.a")
+set(SDL2MAIN_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/lib/libSDL2main.a")
+set(SDL_GPU_LIB "${CMAKE_CURRENT_BINARY_DIR}/sdl_gpu_autofail-prefix/src/sdl_gpu_autofail-build/SDL_gpu/libSDL2_gpu.a")
+ExternalProject_Add(
+  sdl_gpu_autofail
+  SOURCE_DIR ${SRC}
+  INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}
+  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${SRC} -DSDL_gpu_USE_SDL2=True -DSDL_gpu_BUILD_SHARED=False -DSDL_gpu_BUILD_DEMOS=False -DSDL_gpu_BUILD_TOOLS=False -DSDL2MAIN_LIBRARY=${SDL2MAIN_LIBRARY} -DSDL_gpu_BUILD_DEBUG=False -DSDL2_LIBRARY=${SDL2_LIBRARY} -DSDL2_INCLUDE_DIR=${SDL2_INCLUDE_DIR} -DSDL_gpu_INSTALL=False
+  BUILD_COMMAND ${MAKE}
+  INSTALL_COMMAND ${CMAKE_COMMAND} -E copy ${SDL_GPU_LIB} ${CMAKE_CURRENT_BINARY_DIR}/lib
+)
+add_library(sdl_gpu UNKNOWN IMPORTED)
+set_property(TARGET sdl_gpu PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/lib/libSDL_gpu.a)
+add_dependencies(sdl_gpu sdl_gpu_autofail)
+add_dependencies(sdl_gpu_autofail sdl)
 
 # ogg
 set(SRC ${CMAKE_CURRENT_BINARY_DIR}/src/${OGG})
