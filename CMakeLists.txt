@@ -42,17 +42,25 @@ file(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
 
 # Includes
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
-include_directories(${EXTRA_INCLUDES})
 
-# Build lib
-add_executable(${BIN} ${SOURCES})
-target_link_libraries(${BIN} ${LIB})
-target_link_libraries(${BIN} sdl sdl_ttf sdl_img sdl_mixer freetype)
-target_link_libraries(${BIN} ${OPENGL_LIBRARIES} ${EXTRA_LIBS})
-if(APPLE)
-  target_link_libraries(${BIN} -L${CMAKE_CURRENT_BINARY_DIR}/lib -lSDL2 -lm -liconv -Wl,-framework,OpenGL -Wl,-framework,ForceFeedback -lobjc -Wl,-framework,Cocoa -Wl,-framework,Carbon -Wl,-framework,IOKit -Wl,-framework,CoreAudio -Wl,-framework,AudioToolbox -Wl,-framework,AudioUnit)
-else()
-  if(UNIX)
-    target_link_libraries(${BIN} -L${CMAKE_CURRENT_BINARY_DIR}/lib -lSDL2 -lpthread -lm -ldl -lpthread -lrt)
+# Link helper
+function (link BIN) 
+  target_link_libraries(${BIN} ${LIB})
+  target_link_libraries(${BIN} sdl sdl_ttf sdl_img sdl_mixer sdl_gpu freetype)
+  target_link_libraries(${BIN} ${OPENGL_LIBRARIES} ${EXTRA_LIBS})
+  if(APPLE)
+    target_link_libraries(${BIN} -L${CMAKE_CURRENT_BINARY_DIR}/lib -lSDL2 -lm -liconv -Wl,-framework,OpenGL -Wl,-framework,ForceFeedback -lobjc -Wl,-framework,Cocoa -Wl,-framework,Carbon -Wl,-framework,IOKit -Wl,-framework,CoreAudio -Wl,-framework,AudioToolbox -Wl,-framework,AudioUnit)
+  else()
+    if(UNIX)
+      target_link_libraries(${BIN} -L${CMAKE_CURRENT_BINARY_DIR}/lib -lSDL2 -lpthread -lm -ldl -lpthread -lrt)
+    endif()
   endif()
-endif()
+endfunction()
+
+# Example of plain SDL
+add_executable(sdl-test ${CMAKE_CURRENT_SOURCE_DIR}/src/test.c)
+link(sdl-test)
+
+# Example of sdl-gpu
+add_executable(sdl-test-gpu ${CMAKE_CURRENT_SOURCE_DIR}/src/test_gpu.c)
+link(sdl-test-gpu)
